@@ -1,9 +1,8 @@
 import os
 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from .database import init_db
+from .auth import init_auth
 
 
 def create_app(test_config=None):
@@ -27,11 +26,9 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    db.init_app(app)
-
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!!!!'
+    init_db(app)
+    from . import view
+    app.register_blueprint(view.bp)
+    init_auth(app)
 
     return app
