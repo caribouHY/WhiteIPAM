@@ -1,29 +1,35 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>signup - WhiteIPAM</title>
-</head>
-<body>
-  <div>
-    <h1>ログイン</h1>
+{% extends "base.html" %}
+
+{% block title %}
+ログイン - WhiteIPAM
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<div class="d-flex w-100 h-100 mx-auto flex-column">
+  <main class="m-auto">
+    <h1 class="text-center mb-4">WhiteIPAM</h1>
     <p>{{message}}</p>
-    <form method="post">
+    <form method="post" class="pb-5">
       {{ form.hidden_tag() }}
-      {{ form.username.label(class_="btn") }}
-      {{ form.username(size=32, class_="btn") }}
+      <div class="form-floating mb-3">
+        {{ form.username(size=32, class_="form-control") }}
+        {{ form.username.label}}
+      </div>
       {% for error in form.username.errors %}
-        {{ error }}
+      {{ error }}
       {% endfor %}
-      {{ form.password.label }}
-      {{ form.password(size=32) }}
+      <div class="form-floating mb-3">
+        {{ form.password(size=32, class_="form-control") }}
+        {{ form.password.label}}
+      </div>
       {% for error in form.password.errors %}
-        {{ error }}
+      {{ error }}
       {% endfor %}
-      {{ form.submit() }}
+      {{ form.submit(class_="btn btn-lg btn-primary w-100") }}
     </form>
-  </div>
-</body>
-</html>
+  </main>
+</div>
+{% endblock %}
