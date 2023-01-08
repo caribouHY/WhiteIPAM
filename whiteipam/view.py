@@ -1,5 +1,6 @@
 from flask import (
-    Blueprint, render_template, redirect, url_for, session, request
+    Blueprint, render_template, redirect, url_for,
+    session, request, current_app
 )
 from flask_login import (
     UserMixin, login_required, login_user, logout_user, current_user
@@ -22,7 +23,9 @@ def index():
 @bp.route('/logout')
 @login_required
 def logout():
+    username = current_user.username
     logout_user()
+    current_app.logger.info('User "{}" logout.'.format(username))
     return redirect(url_for('root.login'))
 
 
@@ -39,7 +42,10 @@ def login():
             if user is not None and \
                     check_password_hash(user.password, form.password.data):
                 login_user(user)
+                current_app.logger.info(
+                    'User "{}" login success.'.format(user.username))
                 return redirect(url_for('root.index'))
+        current_app.logger.info('login failure.')
         session['message'] = 'ユーザ－名またはパスワードが違います'
         return redirect(url_for('root.login'))
 
