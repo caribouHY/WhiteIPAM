@@ -1,5 +1,6 @@
 from flask import (
-    Blueprint, render_template, redirect, url_for, session)
+    Blueprint, render_template, redirect, url_for, session, request
+)
 from flask_login import (
     UserMixin, login_required, login_user, logout_user, current_user
 )
@@ -31,15 +32,16 @@ def login():
         return redirect(url_for('root.index'))
 
     form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).one_or_none()
-        if user is not None and \
-                check_password_hash(user.password, form.password.data):
-            login_user(user)
-            return redirect(url_for('root.index'))
-        else:
-            session['message'] = 'ユーザ－名またはパスワードが違います'
-            return redirect(url_for('root.login'))
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            user = User.query.filter_by(
+                username=form.username.data).one_or_none()
+            if user is not None and \
+                    check_password_hash(user.password, form.password.data):
+                login_user(user)
+                return redirect(url_for('root.index'))
+        session['message'] = 'ユーザ－名またはパスワードが違います'
+        return redirect(url_for('root.login'))
 
     if 'message' in session:
         message = session['message']
@@ -51,8 +53,10 @@ def login():
 class LoginForm(FlaskForm):
     username = StringField(
         'ユーザー名',
-        validators=[DataRequired(), Length(min=4, max=32)])
-    password = PasswordField('パスワード', validators=[DataRequired()])
+        validators=[DataRequired(), Length(max=32)])
+    password = PasswordField(
+        'パスワード',
+        validators=[DataRequired(), Length(max=32)])
     submit = SubmitField('ログイン')
 
 

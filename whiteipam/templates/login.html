@@ -11,23 +11,21 @@
 <div class="d-flex w-100 h-100 mx-auto flex-column">
   <main class="m-auto">
     <h1 class="text-center mb-4">WhiteIPAM</h1>
-    <p>{{message}}</p>
+    {% if message %}
+    <div class="alert alert-danger" role="alert">
+      {{message}}
+    </div>
+    {% endif %}
     <form method="post" class="pb-5">
       {{ form.hidden_tag() }}
       <div class="form-floating mb-3">
         {{ form.username(size=32, class_="form-control") }}
         {{ form.username.label}}
       </div>
-      {% for error in form.username.errors %}
-      {{ error }}
-      {% endfor %}
       <div class="form-floating mb-3">
         {{ form.password(size=32, class_="form-control") }}
         {{ form.password.label}}
       </div>
-      {% for error in form.password.errors %}
-      {{ error }}
-      {% endfor %}
       {{ form.submit(class_="btn btn-lg btn-primary w-100") }}
     </form>
   </main>
