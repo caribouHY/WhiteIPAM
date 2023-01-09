@@ -44,8 +44,5 @@ def login():
         session['message'] = 'ユーザ－名またはパスワードが違います'
         return redirect(url_for('root.login'))
 
-    if 'message' in session:
-        message = session['message']
-        session.pop('message')
-        return render_template('login.html', form=form, message=message)
-    return render_template('login.html', form=form)
+    message = session.pop('message', None)
+    return render_template('login.html', form=form, message=message)
