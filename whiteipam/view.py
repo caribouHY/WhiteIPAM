@@ -1,3 +1,4 @@
+from ipaddress import ip_network
 from flask import (
     Blueprint, render_template, redirect, url_for,
     session, request, current_app
@@ -5,8 +6,8 @@ from flask import (
 from flask_login import (
     login_required, login_user, logout_user, current_user
 )
-from .forms import LoginForm
-from .controllers import authentication
+from .forms import LoginForm, SubnetRegisterForm
+from .controllers import authentication, create_network
 
 bp = Blueprint('root', __name__)
 
@@ -46,3 +47,29 @@ def login():
 
     message = session.pop('message', None)
     return render_template('login.html', form=form, message=message)
+
+
+@bp.route('/network/', methods=['GET'])
+@login_required
+def network():
+    return render_template('network_list.html')
+
+
+@bp.route('/network/add/', methods=['GET', 'POST'])
+@login_required
+def add_network():
+    form = SubnetRegisterForm()
+    if form.validate_on_submit():
+        if create_network(
+            ipv4=form.ipv4.data,
+            name=form.name.data,
+            vid=form.vid.data,
+            note=form.note.data
+        ):
+            return redirect(url_for('root.network'))
+        else:
+            message = str(ip_network(form.ipv4.data, False)) + \
+                'は既存のネットワークと重複しています。'
+            return render_template('network_register.html',
+                                   form=form, message=message)
+    return render_template('network_register.html', form=form)

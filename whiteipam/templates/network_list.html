@@ -1,0 +1,14 @@
+{% extends "base_main.html" %}
+
+{% block title %}
+ネットワーク - WhiteIPAM
+{% endblock %}
+
+
+{% block content %}
+<div>
+  <h1>サブネット一覧</h1>
+  <a class="btn btn-primary" href="{{url_for('root.add_network')}}" role="button">追加</a>
+</div>
+
+{% endblock %}

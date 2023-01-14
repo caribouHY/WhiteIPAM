@@ -1,0 +1,93 @@
+{% extends "base_main.html" %}
+
+{% block title %}
+サブネット登録 - WhiteIPAM
+{% endblock %}
+
+{% macro render_field(field) %}
+<div class="mb-3">
+  {{ field.label(class_="form-label")}}
+  {% if field.flags.required %}
+    <span class="text-danger">*</span>
+  {% endif %}
+  {{ field(class_="form-control", id=field.name)|safe }}
+</div>
+{% endmacro %}
+
+{% block content %}
+<main class="container mt-3">
+  <div class="row">
+    <div class="col">
+      <h2 class="mb-3">サブネット登録</h2>
+      {% if message %}
+        <div class="alert alert-danger mb-3" role="alert">
+          {{message}}
+        </div>
+      {% endif %}
+      <form method="post" id="regist-form">
+        {{ form.hidden_tag() }}
+        {{ render_field(form.name) }}
+        {{ render_field(form.ipv4) }}
+        {{ render_field(form.vid) }}
+        {{ render_field(form.note) }}
+        {{ form.submit(class_="btn btn-primary") }}
+      </form>
+    </div>
+  </div>
+</main>
+
+{% endblock %}
+
+{% block script %}
+<script>
+  'use strict';
+  const ipv4cird = /^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}\/(3[0-2]|(2|1)[0-9]|[1-9])$/;
+  const local_a = /^10\./
+  const local_a_prefix = /\/(8|9|(1|2)[0-9]|30)$/
+  const local_b = /^172\.(1[6-9]|2[0-9]|30|31)\./
+  const local_b_prefix = /\/(1[2-9]|2[0-9]|30)$/
+  const local_c = /^192\.168\./
+  const local_c_prefix = /\/(1[6-9]|2[0-9]|30)$/
+  function validate_ipv4cird_local(element) {
+    if (element.value.match(ipv4cird)){
+      if(element.value.match(local_a)){
+        if(element.value.match(local_a_prefix)) {
+          element.setCustomValidity('');
+        }else{
+          element.setCustomValidity('プレフィクスは8～30の間で入力してください。');
+        }
+      }else if(element.value.match(local_b)){
+        if(element.value.match(local_b_prefix)) {
+          element.setCustomValidity('');
+        }else{
+          element.setCustomValidity('プレフィクスは12～30の間で入力してください。');
+        }
+      }else if(element.value.match(local_c)){
+        if(element.value.match(local_c_prefix)) {
+          element.setCustomValidity('');
+        }else{
+          element.setCustomValidity('プレフィクスは16～30の間で入力してください。');
+        }
+      }else{
+        element.setCustomValidity('ローカルアドレスを入力してください。');
+      }
+    }else{
+      element.setCustomValidity('192.168.0.0/24の形式で入力してください。');
+    }
+  }
+
+  const ipv4_id = '{{ form.ipv4.name }}';
+  let ipv4_element = document.getElementById(ipv4_id);
+  ipv4_element.addEventListener("input", (e) => {
+    validate_ipv4cird_local(e.target)
+  })
+  let form = document.getElementById("regist-form");
+  form.addEventListener('submit', (e) => {
+    validate_ipv4(ipv4_element);
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  })
+</script>
+{% endblock %}
