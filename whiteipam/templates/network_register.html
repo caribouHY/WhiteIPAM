@@ -83,7 +83,7 @@
   })
   let form = document.getElementById("regist-form");
   form.addEventListener('submit', (e) => {
-    validate_ipv4(ipv4_element);
+    validate_ipv4cidr_local(ipv4_element);
     if (!form.checkValidity()) {
       e.preventDefault();
       e.stopPropagation();
