@@ -38,3 +38,9 @@ def create_host(network_id: int, ipv4_address: str,
     db.session.add(host)
     db.session.commit()
     return host
+
+
+def get_hosts_by_network(network_id):
+    return db.session.execute(
+        db.select(Host).filter(Host.network_id == network_id)
+    ).scalars().all()

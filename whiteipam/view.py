@@ -10,7 +10,7 @@ from .forms import LoginForm, SubnetRegisterForm, HostRegisterForm
 from .controllers import (
     authentication,
     create_network, get_network, get_network_list,
-    create_host,
+    create_host, get_hosts_by_network,
     NotExistError, AlreadyExistError, NetworkRangeError
 )
 
@@ -68,9 +68,11 @@ def network_item(id):
     if net is not None:
         host_form = HostRegisterForm()
         message = session.pop('message', False)
+        hosts = get_hosts_by_network(net.id)
         return render_template('network_item.html',
                                network=net,
                                host_form=host_form,
+                               hosts=hosts,
                                message=message)
     return redirect(url_for('root.network'))
 

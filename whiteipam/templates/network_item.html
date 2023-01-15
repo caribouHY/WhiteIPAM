@@ -57,6 +57,27 @@
             </div>
           </div>
         </div>
+
+        <div class="modal fade" id="hostShowModal" tabindex="-1" aria-labelledby="hostShowModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="hostShowModalLabel">ホスト</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>IPv4 : <span id="host-show-ipv4"></span></p>
+                <p>ホスト名 : <span id="host-show-hostname"></span></p>
+                <p>メモ : <span id="host-show-note">sss</span></p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+              </div>
+          </div>
+        </div>
+      </div>
+
       </div>
     </div>
   </div>
@@ -68,11 +89,27 @@
 <script src="{{ url_for('static', filename='js/iputil.js') }}"></script>
 <script>
   'use strict';
-
+  const HOST = 1;
+  const hosts = [
+    {% for host in hosts %}
+      {
+        'id' : {{host.id}},
+        'ipv4_address' : '{{host.ipv4_address}}',
+        'hostname' : '{{host.hostname}}',
+        'note' : '{{host.note}}'
+      },
+    {% endfor %}
+  ];
   const clickHostRegister = (e) => {
     document.getElementById('host-regist-ipv4').value = e.target.dataset.ip;
   };
-
+  const clickHostShow = (e) => {
+    const i = e.target.dataset.host;
+    console.log(i)
+    document.getElementById('host-show-ipv4').textContent = hosts[i].ipv4_address;
+    document.getElementById('host-show-hostname').textContent = hosts[i].hostname;
+    document.getElementById('host-show-note').textContent = hosts[i].note;
+  };
   const address = '{{ network.ipv4_address }}';
   const prefix = {{ network.ipv4_prefix }};
   const subnetmask = cidr2long(prefix);
@@ -88,18 +125,38 @@
     ipList.push({
       ipNum: i,
       ipStr: long2ip(i),
-      label: long2hostip(i, prefix)
+      label: long2hostip(i, prefix),
+      type: 0,
+      id: 0
     });
   }
   ipList.forEach(ip => {
     const hostBtn = document.createElement('button');
-    hostBtn.classList.add('host', 'btn', 'btn-outline-dark', 'btn-sm', 'me-2', 'mb-2');
+    // hostBtn.classList.add('addr','addr-none', 'btn', 'btn-outline-dark', 'btn-sm', 'me-2', 'mb-2', 'disabled');
+    hostBtn.classList.add('addr','addr-none', 'btn', 'btn-sm', 'me-2', 'mb-2', 'disabled');
     hostBtn.setAttribute('data-ip', ip.ipStr);
-    hostBtn.setAttribute('data-bs-toggle', 'modal');
-    hostBtn.setAttribute('data-bs-target', '#hostRegistModal');
     hostBtn.textContent = ip.label;
-    hostBtn.addEventListener('click', clickHostRegister);
     addrEle.appendChild(hostBtn);
+  });
+
+  hosts.forEach((host, index) => {
+    const ele = document.querySelector('[data-ip="'+host.ipv4_address+'"]');
+    ele.classList.remove('addr-none');
+    ele.classList.add('addr-host', 'btn-success');
+    ele.setAttribute('data-host', index);
+    ele.setAttribute('data-bs-toggle', 'modal');
+    ele.setAttribute('data-bs-target', '#hostShowModal');
+    ele.addEventListener('click', clickHostShow);
+  });
+
+  document.querySelectorAll('.addr').forEach(ele => {
+    if (ele.classList.contains('addr-none')) {
+      ele.classList.add('btn-outline-dark');
+      ele.setAttribute('data-bs-toggle', 'modal');
+      ele.setAttribute('data-bs-target', '#hostRegistModal');
+      ele.addEventListener('click', clickHostRegister);
+    }
+    ele.classList.remove('disabled');
   });
 </script>
 <style>
