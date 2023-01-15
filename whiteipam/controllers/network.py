@@ -1,5 +1,6 @@
 from ipaddress import ip_network
 from flask import current_app
+from sqlalchemy import asc
 from whiteipam.database import db
 from whiteipam.models import Network
 
@@ -52,3 +53,9 @@ def get_network(id: int) -> Network:
     return db.session.execute(
         db.select(Network).filter(Network.id == id)
     ).scalars().one_or_none()
+
+
+def get_network_list():
+    return db.session.execute(
+        db.select(Network).order_by(asc(Network.ipv4_address))
+    ).scalars().all()

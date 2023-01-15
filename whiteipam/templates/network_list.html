@@ -6,9 +6,37 @@
 
 
 {% block content %}
-<div>
-  <h1>サブネット一覧</h1>
-  <a class="btn btn-primary" href="{{url_for('root.add_network')}}" role="button">追加</a>
-</div>
-
+<main class="container mt-3">
+  <div class="row mb-3">
+    <div class="col">
+      <h2>ネットワーク一覧</h1>
+        {% if message %}
+        <div class="alert alert-danger mb-3" role="alert">
+          {{message}}
+        </div>
+        {% endif %}
+        <a class="btn btn-primary" href="{{url_for('root.add_network')}}" role="button">追加</a>
+        <table class="table table-hover table-bordered mt-3">
+          <thead class="table-secondary">
+            <tr>
+              <th scope="col">IPv4</th>
+              <th scope="col">VLAN ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for net in netwroks %}
+            <tr>
+              <td><a href="{{url_for('root.network_item', id=net.id)}}">{{ net.get_ipv4cird() }}</a></td>
+              <td>{{ net.vid }}</td>
+              <td>{{ net.name }}</td>
+              <td>{{ net.note }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+  </div>
+</main>
 {% endblock %}
