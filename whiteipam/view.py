@@ -69,13 +69,14 @@ def network_item(id):
 def add_network():
     form = SubnetRegisterForm()
     if form.validate_on_submit():
-        if create_network(
+        net = create_network(
             ipv4=form.ipv4.data,
             name=form.name.data,
             vid=form.vid.data,
             note=form.note.data
-        ):
-            return redirect(url_for('root.network'))
+        )
+        if net is not None:
+            return redirect(url_for('root.network_item', id=net.id))
         else:
             message = str(ip_network(form.ipv4.data, False)) + \
                 'は既存のネットワークと重複しています。'

@@ -1,10 +1,11 @@
 from ipaddress import ip_network
+from flask import current_app
 from whiteipam.database import db
 from whiteipam.models import Network
 
 
 def create_network(ipv4: str, name: str = None,
-                   vid: int = None, note: str = None) -> bool:
+                   vid: int = None, note: str = None) -> Network:
     v4net = ip_network(ipv4, False)
     net_max = str(v4net)[:str(v4net).find('.')+1]
     net_min = ''
@@ -25,12 +26,12 @@ def create_network(ipv4: str, name: str = None,
     for supernet in supernets:
         s = supernet.ipv4_address+'/'+str(supernet.ipv4_prefix)
         if (v4net.subnet_of(ip_network(s))):
-            return False
+            return None
 
     for subnet in subnets:
         s = subnet.ipv4_address+'/'+str(subnet.ipv4_prefix)
         if (v4net.subnet_of(ip_network(s))):
-            return False
+            return None
 
     network = Network(
         ipv4_address=str(v4net.network_address),
@@ -41,7 +42,10 @@ def create_network(ipv4: str, name: str = None,
     )
     db.session.add(network)
     db.session.commit()
-    return True
+    current_app.logger.debug(
+        'created network (id={} name={} ipv4={})'.format(
+            network.id, network.name, network.get_ipv4cird()))
+    return network
 
 
 def get_network(id: int) -> Network:
