@@ -9,9 +9,9 @@
   <div class="row">
     <div class="col">
       {% if message %}
-        <div class="alert alert-danger mb-3" role="alert">
-          {{message}}
-        </div>
+      <div class="alert alert-danger mb-3 mt-3" role="alert">
+        {{message}}
+      </div>
       {% endif %}
       <ul class="list-group">
         <li class="list-group-item">名前 : {{ network.name }}</li>
@@ -20,8 +20,42 @@
         <li class="list-group-item">メモ : {{ network.note }}</li>
       </ul>
       <div class="mt-3 mb3">
-        <h4>アドレス</h4>
+        <h3>アドレス</h3>
         <div id="address-list" class="d-flex flex-wrap">
+        </div>
+
+        <div class="modal fade" id="hostRegistModal" tabindex="-1" aria-labelledby="hostRegistModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form method="post" action="{{url_for('root.add_host')}}">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="hostRegistModalLabel">新規ホスト作成</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  {{ host_form.csrf_token }}
+                  {{ host_form.network_id(value=network.id) }}
+                  <div class="mb-3">
+                    {{ host_form.ipv4_address.label(class_="form-label")}}
+                    {{ host_form.ipv4_address(class_="form-control", id='host-regist-ipv4', readonly='')|safe}}
+                  </div>
+                  <div class="mb-3">
+                    {{ host_form.hostname.label(class_="form-label")}}
+                    {{ host_form.hostname(class_="form-control", id=host_form.hostname.name)|safe}}
+                  </div>
+                  <div class="mb-3">
+                    {{ host_form.note.label(class_="form-label")}}
+                    {{ host_form.note(class_="form-control", id=host_form.note.name)|safe}}
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <input type="reset" class="btn btn-secondary" data-bs-dismiss="modal" value="キャンセル">
+                  {{ host_form.submit(class_="btn btn-primary") }}
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -34,6 +68,11 @@
 <script src="{{ url_for('static', filename='js/iputil.js') }}"></script>
 <script>
   'use strict';
+
+  const clickHostRegister = (e) => {
+    document.getElementById('host-regist-ipv4').value = e.target.dataset.ip;
+  };
+
   const address = '{{ network.ipv4_address }}';
   const prefix = {{ network.ipv4_prefix }};
   const subnetmask = cidr2long(prefix);
@@ -41,11 +80,11 @@
   const broadcastAddr = getBroadcastAddr(networkAddr, subnetmask);
   console.log(long2ip(networkAddr));
   console.log(long2ip(broadcastAddr));
-  
+
   const addrEle = document.getElementById('address-list');
 
-  let ipList = []
-  for (let i = networkAddr+1; i < broadcastAddr; i++){
+  let ipList = [];
+  for (let i = networkAddr + 1; i < broadcastAddr; i++) {
     ipList.push({
       ipNum: i,
       ipStr: long2ip(i),
@@ -54,9 +93,12 @@
   }
   ipList.forEach(ip => {
     const hostBtn = document.createElement('button');
-    hostBtn.classList.add('host','btn', 'btn-outline-dark', 'btn-sm', 'me-2', 'mb-2');
+    hostBtn.classList.add('host', 'btn', 'btn-outline-dark', 'btn-sm', 'me-2', 'mb-2');
     hostBtn.setAttribute('data-ip', ip.ipStr);
+    hostBtn.setAttribute('data-bs-toggle', 'modal');
+    hostBtn.setAttribute('data-bs-target', '#hostRegistModal');
     hostBtn.textContent = ip.label;
+    hostBtn.addEventListener('click', clickHostRegister);
     addrEle.appendChild(hostBtn);
   });
 </script>

@@ -33,3 +33,22 @@ class Network(db.Model):
 
     def get_ipv4cidr(self) -> str:
         return '{}/{}'.format(self.ipv4_address, self.ipv4_prefix)
+
+
+class Host(db.Model):
+
+    __tablename__ = 'hosts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    network_id = db.Column(db.Integer, db.ForeignKey("network.id"))
+    hostname = db.Column(db.String(64))
+    ipv4_address = db.Column(db.String(16), nullable=False, unique=True)
+    note = db.Column(db.String(64))
+
+    def __init__(self, network_id: str, ipv4_address: str,
+                 hostname: str = None, note: str = None) -> None:
+        super().__init__()
+        self.network_id = network_id
+        self.hostname = hostname
+        self.ipv4_address = ipv4_address
+        self.note = note
