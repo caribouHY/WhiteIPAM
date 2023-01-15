@@ -7,7 +7,7 @@ from flask_login import (
     login_required, login_user, logout_user, current_user
 )
 from .forms import LoginForm, SubnetRegisterForm
-from .controllers import authentication, create_network
+from .controllers import authentication, create_network, get_network
 
 bp = Blueprint('root', __name__)
 
@@ -53,6 +53,15 @@ def login():
 @login_required
 def network():
     return render_template('network_list.html')
+
+
+@bp.route('/network/<int:id>/')
+@login_required
+def network_item(id):
+    net = get_network(id)
+    if net is not None:
+        return render_template('network_item.html', network=net)
+    return redirect(url_for('root.network'))
 
 
 @bp.route('/network/add/', methods=['GET', 'POST'])

@@ -42,3 +42,9 @@ def create_network(ipv4: str, name: str = None,
     db.session.add(network)
     db.session.commit()
     return True
+
+
+def get_network(id: int) -> Network:
+    return db.session.execute(
+        db.select(Network).filter(Network.id == id)
+    ).scalars().one_or_none()
