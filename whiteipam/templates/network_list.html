@@ -28,7 +28,7 @@
           <tbody>
             {% for net in netwroks %}
             <tr>
-              <td><a href="{{url_for('root.network_item', id=net.id)}}">{{ net.get_ipv4cird() }}</a></td>
+              <td><a href="{{url_for('root.network_item', id=net.id)}}">{{ net.get_ipv4cidr() }}</a></td>
               <td>{{ net.vid }}</td>
               <td>{{ net.name }}</td>
               <td>{{ net.note }}</td>

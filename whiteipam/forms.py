@@ -11,7 +11,7 @@ from wtforms.validators import (
 )
 
 
-def ipv4cird_private_check(form, field):
+def ipv4cidr_private_check(form, field):
     try:
         v4net = IPv4Network(field.data, False)
         if v4net.is_private is False:
@@ -42,9 +42,9 @@ class SubnetRegisterForm(FlaskForm):
         validators=[Optional(), NumberRange(min=0, max=4096)]
     )
     ipv4 = StringField(
-        'IPv4 (CIRD)',
+        'IPv4 (CIDR)',
         validators=[DataRequired(),
-                    ipv4cird_private_check]
+                    ipv4cidr_private_check]
     )
     note = StringField(
         'メモ',

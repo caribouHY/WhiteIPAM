@@ -45,7 +45,7 @@ def create_network(ipv4: str, name: str = None,
     db.session.commit()
     current_app.logger.debug(
         'created network (id={} name={} ipv4={})'.format(
-            network.id, network.name, network.get_ipv4cird()))
+            network.id, network.name, network.get_ipv4cidr()))
     return network
 
 

@@ -31,5 +31,5 @@ class Network(db.Model):
         self.vid = vid
         self.note = note
 
-    def get_ipv4cird(self) -> str:
+    def get_ipv4cidr(self) -> str:
         return '{}/{}'.format(self.ipv4_address, self.ipv4_prefix)
